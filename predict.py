@@ -158,6 +158,6 @@ if __name__ == '__main__':
     east_detect = east.east_network()
     # east_detect.load_weights(cfg.saved_model_weights_file_path)   # 加载权重参数
     print("ffffff")
-    east_detect.load_weights('saved_model/east_model_weights_3T736_official.h5')   # 加载权重参数
+    east_detect.load_weights('saved_model/east_model_weights_3T640.h5')   # 加载权重参数
     print("ffffff")
     predict(east_detect, img_path, threshold)

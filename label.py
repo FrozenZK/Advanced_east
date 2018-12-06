@@ -95,7 +95,7 @@ def shrink_edge(xy_list, new_xy_list, edge, r, theta, ratio=cfg.shrink_ratio):
         xy_list[end_point, 1] + \
         long_end_sign_y * ratio * r[end_point] * np.sin(theta[start_point])
 
-# 生成训练数据和验证数据的 gt文件，numpy格式，存放在同个文件夹
+# 转换训练数据和验证数据的 gt文件(numpy格式)，这些存放在同个文件夹
 def process_label(data_dir=cfg.data_dir):
     with open(os.path.join(data_dir, cfg.val_fname), 'r') as f_val:
         f_list = f_val.readlines()

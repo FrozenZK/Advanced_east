@@ -20,6 +20,8 @@ KTF.set_session(sess)
 east = East()
 east_network = east.east_network()
 east_network.summary()
+
+# 设置 loss 函数
 east_network.compile(loss=quad_loss, optimizer=Adam(lr=cfg.lr,
                                                     # clipvalue=cfg.clipvalue,
                                                     decay=cfg.decay))
@@ -27,6 +29,7 @@ east_network.compile(loss=quad_loss, optimizer=Adam(lr=cfg.lr,
 # fine-tuning						
 if cfg.load_weights and os.path.exists(cfg.last_saved_model_weights_file_path):
     print("ggggggggggggggggggggggggggggggggggggggggggggg")
+    print("load : " + cfg.last_saved_model_weights_file_path)
     east_network.load_weights(cfg.last_saved_model_weights_file_path)   # 上一次加载权重参数
 
 east_network.fit_generator(generator=gen(),    # 产生训练集

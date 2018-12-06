@@ -14,7 +14,7 @@ def batch_reorder_vertexes(xy_list_array):
         reorder_xy_list_array[i] = reorder_vertexes(xy_list)
     return reorder_xy_list_array
 
-
+# 排序坐标
 def reorder_vertexes(xy_list):
     reorder_xy_list = np.zeros_like(xy_list)
     # determine the first point with the smallest x,
@@ -104,11 +104,11 @@ def preprocess():
         os.mkdir(show_act_image_dir)
 
     # 训练数据预处理
-    o_img_list = os.listdir(origin_image_dir)
+    o_img_list = os.listdir(origin_image_dir)   # 返回指定的文件夹包含的文件或文件夹的名字的列表
     print('found %d train origin images.' % len(o_img_list))
     train_val_set = []
     for o_img_fname, _ in zip(o_img_list, tqdm(range(len(o_img_list)))):
-        with Image.open(os.path.join(origin_image_dir, o_img_fname)) as im:
+        with Image.open(os.path.join(origin_image_dir, o_img_fname)) as im:   # 打开图片
             # d_wight, d_height = resize_image(im)
             d_wight, d_height = cfg.max_train_img_size, cfg.max_train_img_size
             scale_ratio_w = d_wight / im.width
@@ -118,16 +118,16 @@ def preprocess():
             # draw on the img
             draw = ImageDraw.Draw(show_gt_im)
             with open(os.path.join(origin_txt_dir,
-                                   o_img_fname[:-4] + '.txt'), 'r') as f:
+                                   o_img_fname[:-4] + '.txt'), 'r') as f:   # 打开标签文件
                 anno_list = f.readlines()
-            xy_list_array = np.zeros((len(anno_list), 4, 2))     # 标签转化为numpy
-            for anno, i in zip(anno_list, range(len(anno_list))):
+            xy_list_array = np.zeros((len(anno_list), 4, 2))     # 标签转化为 numpy 的格式
+            for anno, i in zip(anno_list, range(len(anno_list))):   # 对该标签文件的每一个框
                 anno_colums = anno.strip().split(',')
                 anno_array = np.array(anno_colums)
-                xy_list = np.reshape(anno_array[:8].astype(float), (4, 2))
-                xy_list[:, 0] = xy_list[:, 0] * scale_ratio_w
-                xy_list[:, 1] = xy_list[:, 1] * scale_ratio_h
-                xy_list = reorder_vertexes(xy_list)
+                xy_list = np.reshape(anno_array[:8].astype(float), (4, 2))  # 取前8位
+                xy_list[:, 0] = xy_list[:, 0] * scale_ratio_w   # 横坐标 resize
+                xy_list[:, 1] = xy_list[:, 1] * scale_ratio_h   # 纵坐标 resize
+                xy_list = reorder_vertexes(xy_list)  排序坐标
                 xy_list_array[i] = xy_list
                 _, shrink_xy_list, _ = shrink(xy_list, cfg.shrink_ratio)
                 shrink_1, _, long_edge = shrink(xy_list, cfg.shrink_side_ratio)
@@ -182,7 +182,7 @@ def preprocess():
 
     o_img_list = os.listdir(origin_test_dir)
     print('found %d origin images.' % len(o_img_list))
-    train_val_set = []
+    test_val_set = []
     for o_img_fname, _ in zip(o_img_list, tqdm(range(len(o_img_list)))):
         with Image.open(os.path.join(origin_test_dir, o_img_fname)) as im:
             # d_wight, d_height = resize_image(im)
@@ -237,21 +237,21 @@ def preprocess():
                 xy_list_array)
             if draw_gt_quad:
                 show_gt_im.save(os.path.join(show_gt_image_dir, o_img_fname))
-            train_val_set.append('{},{},{}\n'.format(o_img_fname,
+            test_val_set.append('{},{},{}\n'.format(o_img_fname,
                                                      d_wight,
                                                      d_height))
 
 
 
     train_img_list = os.listdir(train_image_dir)   # 找到训练图像的目录 （resize过后的）
-    print('found %d train + test images.' % len(train_img_list))
+    print('found %d (train + test) images.' % len(train_img_list))
     train_label_list = os.listdir(train_label_dir)   # 找到训练标签的目录 （resize过后的）
-    print('found %d train + test labels.' % len(train_label_list))
+    print('found %d (train + test) labels.' % len(train_label_list))
 
     # random.shuffle(train_val_set)   # 打乱
     # val_count = int(cfg.validation_split_ratio * len(train_val_set))  # 划分验证集和训练集
     with open(os.path.join(data_dir, cfg.val_fname), 'w') as f_val:    # 将验证集图像名写入
-        f_val.writelines(train_val_set[:])
+        f_val.writelines(test_val_set[:])
     #with open(os.path.join(data_dir, cfg.train_fname), 'w') as f_train:   # 训练集图像名写入
         #f_train.writelines(train_val_set[val_count:])
 

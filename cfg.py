@@ -1,13 +1,13 @@
 import os
 
-train_task_id = '3T256'  # 后面3位设置输入图片的大小
+train_task_id = '3T640'  # 后面3位设置输入图片的大小
 initial_epoch = 0
 epoch_num = 24   # epoch 数
-lr = 1e-3
+lr = 1e-4
 decay = 5e-4
 # clipvalue = 0.5  # default 0.5, 0 means no clip
-patience = 10   # 最大验证集容忍次数
-load_weights = False   # fine-tuning
+patience = 7   # 最大验证集容忍次数
+load_weights = True   # fine-tuning
 lambda_inside_score_loss = 4.0
 lambda_side_vertex_code_loss = 1.0
 lambda_side_vertex_coord_loss = 1.0
@@ -42,8 +42,8 @@ train_label_dir_name = 'labels_%s/' % train_task_id	  # 训练图片标签总目
 show_gt_image_dir_name = 'show_gt_images_%s/' % train_task_id
 show_act_image_dir_name = 'show_act_images_%s/' % train_task_id
 gen_origin_img = True
-draw_gt_quad = True
-draw_act_quad = True
+draw_gt_quad = False
+draw_act_quad = False
 val_fname = 'val_%s.txt' % train_task_id
 train_fname = 'train_%s.txt' % train_task_id
 # in paper it's 0.3, maybe to large to this problem
@@ -75,7 +75,7 @@ saved_model_weights_file_path = 'saved_model/east_model_weights_%s.h5'\
 								
 # 上次存储的权重参数文件地址
 last_saved_model_weights_file_path = 'saved_model/east_model_weights_%s.h5'\
-                                % '3T256'				
+                                % '3T512'				
 
 pixel_threshold = 0.9
 side_vertex_pixel_threshold = 0.9
