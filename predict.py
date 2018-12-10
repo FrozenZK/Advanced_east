@@ -38,27 +38,39 @@ def cut_text_line(geo, scale_ratio_w, scale_ratio_h, im_array, img_path, s):
 
 def predict(east_detect, img_path, pixel_threshold, quiet=False):
     img = image.load_img(img_path)
-    d_wight, d_height = resize_image(img, cfg.max_predict_img_size)
+    d_wight, d_height = resize_image(img, cfg.max_predict_img_size)   # 在预测前先resize
     img = img.resize((d_wight, d_height), Image.NEAREST).convert('RGB')
+
+    #  不resize
+    # img = img.convert('RGB')
+
+
     img = image.img_to_array(img)
     img = preprocess_input(img, mode='tf')
     x = np.expand_dims(img, axis=0)
-    y = east_detect.predict(x)
+    y = east_detect.predict(x)   # 预测
 
     y = np.squeeze(y, axis=0)
     y[:, :, :3] = sigmoid(y[:, :, :3])
-    cond = np.greater_equal(y[:, :, 0], pixel_threshold)
+
+    print(len(y))
+
+    cond = np.greater_equal(y[:, :, 0], pixel_threshold)  # NMS阈值
     activation_pixels = np.where(cond)
+
     quad_scores, quad_after_nms = nms(y, activation_pixels)
+
     with Image.open(img_path) as im:
         im_array = image.img_to_array(im.convert('RGB'))
         d_wight, d_height = resize_image(im, cfg.max_predict_img_size)
+
         scale_ratio_w = d_wight / im.width
         scale_ratio_h = d_height / im.height
+
         im = im.resize((d_wight, d_height), Image.NEAREST).convert('RGB')
         quad_im = im.copy()
         draw = ImageDraw.Draw(im)
-        for i, j in zip(activation_pixels[0], activation_pixels[1]):
+        for i, j in zip(activation_pixels[0], activation_pixels[1]):   # 画框
             px = (j + 0.5) * cfg.pixel_size
             py = (i + 0.5) * cfg.pixel_size
             line_width, line_color = 1, 'red'
@@ -94,6 +106,8 @@ def predict(east_detect, img_path, pixel_threshold, quiet=False):
             elif not quiet:
                 print('quad invalid with vertex num less then 4.')
         quad_im.save(img_path + '_predict.jpg')
+
+        # 写坐标
         if cfg.predict_write2txt and len(txt_items) > 0:
             with open(img_path[:-4] + '.txt', 'w') as f_txt:
                 f_txt.writelines(txt_items)
@@ -108,7 +122,7 @@ def predict_txt(east_detect, img_path, txt_path, pixel_threshold, quiet=False):
     img = image.img_to_array(img)
     img = preprocess_input(img, mode='tf')
     x = np.expand_dims(img, axis=0)
-    y = east_detect.predict(x)
+    y = east_detect.predict(x)  # 预测
 
     y = np.squeeze(y, axis=0)
     y[:, :, :3] = sigmoid(y[:, :, :3])
@@ -144,10 +158,10 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     img_path = args.path
-    threshold = float(args.threshold)
+    threshold = float(args.threshold)  # 阈值设置
     print(img_path, threshold)
 	
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"  # 设置GPU占用哪一个
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # 设置GPU占用哪一个
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth=True  # 不全部占满显存, 按需分配
@@ -158,6 +172,6 @@ if __name__ == '__main__':
     east_detect = east.east_network()
     # east_detect.load_weights(cfg.saved_model_weights_file_path)   # 加载权重参数
     print("ffffff")
-    east_detect.load_weights('saved_model/east_model_weights_3T640.h5')   # 加载权重参数
+    east_detect.load_weights('saved_model/east_model_weights_3T736_official.h5')   # 加载权重参数
     print("ffffff")
     predict(east_detect, img_path, threshold)

@@ -25,7 +25,7 @@ east_network.summary()
 east_network.compile(loss=quad_loss, optimizer=Adam(lr=cfg.lr,
                                                     # clipvalue=cfg.clipvalue,
                                                     decay=cfg.decay))
-						
+
 # fine-tuning						
 if cfg.load_weights and os.path.exists(cfg.last_saved_model_weights_file_path):
     print("ggggggggggggggggggggggggggggggggggggggggggggg")

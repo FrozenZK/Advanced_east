@@ -14,7 +14,6 @@ as height and width respectively.
 
 
 class East:
-
     def __init__(self):
         self.input_img = Input(name='input_img',
                                shape=(None, None, cfg.num_channels),

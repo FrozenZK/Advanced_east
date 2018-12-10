@@ -101,17 +101,17 @@ def process_label(data_dir=cfg.data_dir):
         f_list = f_val.readlines()
     with open(os.path.join(data_dir, cfg.train_fname), 'r') as f_train:
         f_list.extend(f_train.readlines())
-    for line, _ in zip(f_list, tqdm(range(len(f_list)))):
+    for line, _ in zip(f_list, tqdm(range(len(f_list)))):   # 获得图片resize后的高，宽
         line_cols = str(line).strip().split(',')
         img_name, width, height = \
             line_cols[0].strip(), int(line_cols[1].strip()), \
             int(line_cols[2].strip())
-        gt = np.zeros((height // cfg.pixel_size, width // cfg.pixel_size, 7))
+        gt = np.zeros((height // cfg.pixel_size, width // cfg.pixel_size, 7))   # 宽，高都除以4
         train_label_dir = os.path.join(data_dir, cfg.train_label_dir_name)
         xy_list_array = np.load(os.path.join(train_label_dir,
                                              img_name[:-4] + '.npy'))
         train_image_dir = os.path.join(data_dir, cfg.train_image_dir_name)
-        with Image.open(os.path.join(train_image_dir, img_name)) as im:
+        with Image.open(os.path.join(train_image_dir, img_name)) as im:  # 打开图片
             draw = ImageDraw.Draw(im)
             for xy_list in xy_list_array:
                 _, shrink_xy_list, _ = shrink(xy_list, cfg.shrink_ratio)
